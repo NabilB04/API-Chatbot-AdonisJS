@@ -9,14 +9,14 @@ import { randomUUID } from 'node:crypto'
 export default class ConversationsController {
   private chatbotService = new ChatbotService()
 
-  // POST /questions
+  // POST questions
   async sendQuestion({ request, response }: HttpContext) {
     try {
       const payload = await request.validateUsing(questionValidator)
 
       let sessionId = payload.session_id || randomUUID()
 
-      // Find or create conversation
+      // Create conversation
       let conversation = await Conversation.findBy('session_id', sessionId)
       if (!conversation) {
         conversation = await Conversation.create({
@@ -110,7 +110,6 @@ export default class ConversationsController {
 
       let conversation
       if (isNaN(identifier)) {
-        // UUID/String
         conversation = await Conversation.query()
           .where('session_id', identifier)
           .preload('messages', (query) => {
@@ -118,7 +117,6 @@ export default class ConversationsController {
           })
           .first()
       } else {
-        // ID
         conversation = await Conversation.query()
           .where('id', identifier)
           .preload('messages', (query) => {
@@ -148,7 +146,7 @@ export default class ConversationsController {
     }
   }
 
-  // DELETE /conversation/:id (Bonus Feature)
+  // DELETE /conversation/:id 
   async deleteConversation({ params, response }: HttpContext) {
     try {
       const conversation = await Conversation.find(params.id)

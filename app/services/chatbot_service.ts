@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import axios from 'axios'
 
 export default class ChatbotService {
   private apiUrl = 'https://api.majadigidev.jatimprov.go.id/api/external/chatbot/send-message'
@@ -11,21 +12,14 @@ export default class ChatbotService {
         session_id: sessionId || randomUUID()
       }
 
-      const response = await fetch(this.apiUrl, {
-        method: 'POST',
+      const response = await axios.post(this.apiUrl, payload, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
-        },
-        body: JSON.stringify(payload)
+        }
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      return data
+      return response.data
     } catch (error) {
       console.error('External API Error:', error)
       throw new Error('Failed to get response from chatbot service')
